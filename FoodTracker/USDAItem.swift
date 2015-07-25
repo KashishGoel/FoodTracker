@@ -2,19 +2,19 @@
 //  USDAItem.swift
 //  FoodTracker
 //
-//  Created by Kashish Goel on 2015-07-24.
-//  Copyright (c) 2015 Kashish Goel. All rights reserved.
+//  Created by Eliot Arntz on 12/13/14.
+//  Copyright (c) 2014 BitFountain. All rights reserved.
 //
 
 import Foundation
 import CoreData
+
 @objc (USDAItem)
 class USDAItem: NSManagedObject {
 
     @NSManaged var calcium: String
-    @NSManaged var calories: String
-    @NSManaged var carboHydrate: String
-    @NSManaged var cholestrol: String
+    @NSManaged var carbohydrate: String
+    @NSManaged var cholesterol: String
     @NSManaged var dateAdded: NSDate
     @NSManaged var energy: String
     @NSManaged var fatTotal: String
