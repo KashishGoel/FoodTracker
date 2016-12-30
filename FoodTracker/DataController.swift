@@ -15,7 +15,7 @@ let kUSDAItemCompleted = "USDAItemInstanceComplete"
 
 class DataController {
     
-    class func jsonAsUSDAIdAndNameSearchResults (json : NSDictionary) -> [(name: String, idValue: String)] {
+    class func jsonAsUSDAIdAndNameSearchResults (_ json : NSDictionary) -> [(name: String, idValue: String)] {
         
         var usdaItemsSearchResults:[(name : String, idValue: String)] = []
         var searchResult: (name: String, idValue : String)
@@ -43,7 +43,7 @@ class DataController {
     
     
     //iterates into the api to get values and names
-    func saveUSDAItemForId(idValue: String, json : NSDictionary) {
+    func saveUSDAItemForId(_ idValue: String, json : NSDictionary) {
         
         if json["hits"] != nil {
             let results:[AnyObject] = json["hits"]! as![AnyObject]
@@ -52,9 +52,9 @@ class DataController {
                 
                 if itemDictionary["_id"] != nil && itemDictionary["_id"] as! String == idValue {
                     
-                    let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
+                    let managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).managedObjectContext
                     
-                    var requestForUSDAItem = NSFetchRequest(entityName: "USDAItem")
+                    let requestForUSDAItem = NSFetchRequest<NSFetchRequestResult>(entityName: "USDAItem")
                     
                     let itemDictionaryId = itemDictionary["_id"]! as!String
                     let predicate = NSPredicate(format: "idValue == %@", itemDictionaryId)
@@ -62,21 +62,27 @@ class DataController {
                     
                     var error: NSError?
                     
-                    var items = managedObjectContext?.executeFetchRequest(requestForUSDAItem, error: &error)
+                    var items: [AnyObject]?
+                    do {
+                        items = try managedObjectContext?.fetch(requestForUSDAItem)
+                    } catch let error1 as NSError {
+                        error = error1
+                        items = nil
+                    }
                     //                    var count = managedObjectContext?.countForFetchRequest(requestForUSDAItem, error: &error)
                     
                     if items?.count != 0 {
                         //The item is already saved
-                        println("The Item was already saved!")
+                        print("The Item was already saved!")
                         return
                     }
                     else {
-                        println("Lets Save this to CoreData!")
+                        print("Lets Save this to CoreData!")
                         
-                        let entityDescription = NSEntityDescription.entityForName("USDAItem", inManagedObjectContext: managedObjectContext!)
-                        let usdaItem = USDAItem(entity: entityDescription!, insertIntoManagedObjectContext: managedObjectContext!)
+                        let entityDescription = NSEntityDescription.entity(forEntityName: "USDAItem", in: managedObjectContext!)
+                        let usdaItem = USDAItem(entity: entityDescription!, insertInto: managedObjectContext!)
                         usdaItem.idValue = itemDictionary["_id"]! as! String
-                        usdaItem.dateAdded = NSDate()
+                        usdaItem.dateAdded = Date()
                         
                         if itemDictionary["fields"] != nil {
                             let fieldsDictionary = itemDictionary["fields"]! as! NSDictionary
@@ -89,7 +95,7 @@ class DataController {
                                 
                                 if usdaFieldsDictionary["CA"] != nil {
                                     let calciumDictionary = usdaFieldsDictionary["CA"]! as! NSDictionary
-                                    let calciumValue: AnyObject = calciumDictionary["value"]!
+                                    let calciumValue: AnyObject = calciumDictionary["value"]! as AnyObject
                                     usdaItem.calcium = "\(calciumValue)"
                                 }
                                 else {
@@ -99,7 +105,7 @@ class DataController {
                                 if usdaFieldsDictionary["CHOCDF"] != nil {
                                     let carbohydrateDictionary = usdaFieldsDictionary["CHOCDF"]! as! NSDictionary
                                     if carbohydrateDictionary["value"] != nil {
-                                        let carbohydrateValue: AnyObject = carbohydrateDictionary["value"]!
+                                        let carbohydrateValue: AnyObject = carbohydrateDictionary["value"]! as AnyObject
                                         usdaItem.carbohydrate = "\(carbohydrateValue)"
                                     }
                                 }
@@ -110,7 +116,7 @@ class DataController {
                                 if usdaFieldsDictionary["FAT"] != nil {
                                     let fatTotalDictionary = usdaFieldsDictionary["FAT"]! as! NSDictionary
                                     if fatTotalDictionary["value"] != nil {
-                                        let fatTotalValue:AnyObject = fatTotalDictionary["value"]!
+                                        let fatTotalValue:AnyObject = fatTotalDictionary["value"]! as AnyObject
                                         usdaItem.fatTotal = "\(fatTotalValue)"
                                     }
                                 }
@@ -121,7 +127,7 @@ class DataController {
                                 if usdaFieldsDictionary["CHOLE"] != nil {
                                     let cholesterolDictionary = usdaFieldsDictionary["CHOLE"]! as! NSDictionary
                                     if cholesterolDictionary["value"] != nil {
-                                        let cholesterolValue: AnyObject = cholesterolDictionary["value"]!
+                                        let cholesterolValue: AnyObject = cholesterolDictionary["value"]! as AnyObject
                                         usdaItem.cholesterol = "\(cholesterolValue)"
                                     }
                                 }
@@ -132,7 +138,7 @@ class DataController {
                                 if usdaFieldsDictionary["PROCNT"] != nil {
                                     let proteinDictionary = usdaFieldsDictionary["PROCNT"]! as! NSDictionary
                                     if proteinDictionary["value"] != nil {
-                                        let proteinValue: AnyObject = proteinDictionary["value"]!
+                                        let proteinValue: AnyObject = proteinDictionary["value"]! as AnyObject
                                         usdaItem.protein = "\(proteinValue)"
                                     }
                                 }
@@ -143,7 +149,7 @@ class DataController {
                                 if usdaFieldsDictionary["SUGAR"] != nil {
                                     let sugarDictionary = usdaFieldsDictionary["SUGAR"]! as! NSDictionary
                                     if sugarDictionary["value"] != nil {
-                                        let sugarValue:AnyObject = sugarDictionary["value"]!
+                                        let sugarValue:AnyObject = sugarDictionary["value"]! as AnyObject
                                         usdaItem.sugar = "\(sugarValue)"
                                     }
                                 }
@@ -154,7 +160,7 @@ class DataController {
                                 if usdaFieldsDictionary["VITC"] != nil {
                                     let vitaminCDictionary = usdaFieldsDictionary["VITC"]! as! NSDictionary
                                     if vitaminCDictionary["value"] != nil {
-                                        let vitaminCValue: AnyObject = vitaminCDictionary["value"]!
+                                        let vitaminCValue: AnyObject = vitaminCDictionary["value"]! as AnyObject
                                         usdaItem.vitaminC = "\(vitaminCValue)"
                                     }
                                 }
@@ -165,7 +171,7 @@ class DataController {
                                 if usdaFieldsDictionary["ENERC_KCAL"] != nil {
                                     let energyDictionary = usdaFieldsDictionary["ENERC_KCAL"]! as! NSDictionary
                                     if energyDictionary["value"] != nil {
-                                        let energyValue: AnyObject = energyDictionary["value"]!
+                                        let energyValue: AnyObject = energyDictionary["value"]! as AnyObject
                                         usdaItem.energy = "\(energyValue)"
                                     }
                                 }
@@ -173,8 +179,8 @@ class DataController {
                                     usdaItem.energy = "0"
                                 }
                                 
-                                (UIApplication.sharedApplication().delegate as! AppDelegate).saveContext()
-                                NSNotificationCenter.defaultCenter().postNotificationName(kUSDAItemCompleted, object: usdaItem)
+                                (UIApplication.shared.delegate as! AppDelegate).saveContext()
+                                NotificationCenter.default.post(name: Notification.Name(rawValue: kUSDAItemCompleted), object: usdaItem)
                             }
                         }
                     }

@@ -15,7 +15,7 @@ class USDAItem: NSManagedObject {
     @NSManaged var calcium: String
     @NSManaged var carbohydrate: String
     @NSManaged var cholesterol: String
-    @NSManaged var dateAdded: NSDate
+    @NSManaged var dateAdded: Date
     @NSManaged var energy: String
     @NSManaged var fatTotal: String
     @NSManaged var idValue: String

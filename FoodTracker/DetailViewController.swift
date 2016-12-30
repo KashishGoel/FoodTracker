@@ -17,10 +17,10 @@ class DetailViewController: UIViewController {
     
     @IBOutlet weak var textView: UITextView!
     
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "usdaItemDidComplete:", name: kUSDAItemCompleted, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(DetailViewController.usdaItemDidComplete(_:)), name: NSNotification.Name(rawValue: kUSDAItemCompleted), object: nil)
     }
     
     override func viewDidLoad() {
@@ -35,7 +35,7 @@ class DetailViewController: UIViewController {
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func didReceiveMemoryWarning() {
@@ -43,96 +43,96 @@ class DetailViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    func usdaItemDidComplete(notification: NSNotification) {
+    func usdaItemDidComplete(_ notification: Notification) {
         
-        println("usdaItemDidComplete in DetailViewController")
+        print("usdaItemDidComplete in DetailViewController")
         usdaItem = notification.object as? USDAItem
         
-        if self.isViewLoaded() && self.view.window != nil {
+        if self.isViewLoaded && self.view.window != nil {
             textView.attributedText = createAttributedString(usdaItem!)
         }
         
     }
     
-    @IBAction func eatItBarButtonItemPressed(sender: UIBarButtonItem) {
+    @IBAction func eatItBarButtonItemPressed(_ sender: UIBarButtonItem) {
         
     }
     //4 detail text view bod
-    func createAttributedString (usdaItem: USDAItem!) -> NSAttributedString {
+    func createAttributedString (_ usdaItem: USDAItem!) -> NSAttributedString {
         
-        var itemAttributedString = NSMutableAttributedString()
+        let itemAttributedString = NSMutableAttributedString()
         
-        var centeredParagraphStyle = NSMutableParagraphStyle()
-        centeredParagraphStyle.alignment = NSTextAlignment.Center
+        let centeredParagraphStyle = NSMutableParagraphStyle()
+        centeredParagraphStyle.alignment = NSTextAlignment.center
         centeredParagraphStyle.lineSpacing = 10.0
         
-        var titleAttributesDictionary = [
-            NSForegroundColorAttributeName : UIColor.blackColor(),
-            NSFontAttributeName : UIFont.boldSystemFontOfSize(22.0),
+        let titleAttributesDictionary = [
+            NSForegroundColorAttributeName : UIColor.black,
+            NSFontAttributeName : UIFont.boldSystemFont(ofSize: 22.0),
             NSParagraphStyleAttributeName : centeredParagraphStyle]
         
         let titleString = NSAttributedString(string: "\(usdaItem.name)\n", attributes: titleAttributesDictionary)
-        itemAttributedString.appendAttributedString(titleString)
+        itemAttributedString.append(titleString)
         
         //helper
-        var leftAlignedParagraphStyle = NSMutableParagraphStyle()
-        leftAlignedParagraphStyle.alignment = NSTextAlignment.Left
+        let leftAlignedParagraphStyle = NSMutableParagraphStyle()
+        leftAlignedParagraphStyle.alignment = NSTextAlignment.left
         leftAlignedParagraphStyle.lineSpacing = 20.0
         
         //4 type (e.g protein)
-        var styleFirstWordAttributesDictionary = [NSForegroundColorAttributeName: UIColor.blackColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(18.0),NSParagraphStyleAttributeName:leftAlignedParagraphStyle]
+        let styleFirstWordAttributesDictionary = [NSForegroundColorAttributeName: UIColor.black, NSFontAttributeName: UIFont.boldSystemFont(ofSize: 18.0),NSParagraphStyleAttributeName:leftAlignedParagraphStyle]
         //2 diff types, not much diff
-        var style1AttributesDictionary = [NSForegroundColorAttributeName:UIColor.darkGrayColor(), NSFontAttributeName:UIFont.systemFontOfSize(18.0), NSParagraphStyleAttributeName: leftAlignedParagraphStyle]
-        var style2AttributesDictionary = [NSForegroundColorAttributeName: UIColor.lightGrayColor(), NSFontAttributeName: UIFont.systemFontOfSize(18.0), NSParagraphStyleAttributeName:leftAlignedParagraphStyle]
+        let style1AttributesDictionary = [NSForegroundColorAttributeName:UIColor.darkGray, NSFontAttributeName:UIFont.systemFont(ofSize: 18.0), NSParagraphStyleAttributeName: leftAlignedParagraphStyle]
+        let style2AttributesDictionary = [NSForegroundColorAttributeName: UIColor.lightGray, NSFontAttributeName: UIFont.systemFont(ofSize: 18.0), NSParagraphStyleAttributeName:leftAlignedParagraphStyle]
         
         
         //adding calcium
         let calciumTitleString = NSAttributedString(string: "Calcium ", attributes: styleFirstWordAttributesDictionary)
         let calciumBodyString = NSAttributedString(string: "\(usdaItem.calcium)%\n", attributes: style1AttributesDictionary)
-        itemAttributedString.appendAttributedString(calciumTitleString)
-        itemAttributedString.appendAttributedString(calciumBodyString)
+        itemAttributedString.append(calciumTitleString)
+        itemAttributedString.append(calciumBodyString)
         
         //carbo
         let carbohydrateTitleString = NSAttributedString(string: "Carbohydrate ", attributes: styleFirstWordAttributesDictionary)
         let carbohydrateBodyString = NSAttributedString(string: "\(usdaItem.carbohydrate)% \n", attributes: style2AttributesDictionary)
-        itemAttributedString.appendAttributedString(carbohydrateTitleString)
-        itemAttributedString.appendAttributedString(carbohydrateBodyString)
+        itemAttributedString.append(carbohydrateTitleString)
+        itemAttributedString.append(carbohydrateBodyString)
        
         //chlostererol
         let cholesterolTitleString = NSAttributedString(string: "Cholesterol ", attributes: styleFirstWordAttributesDictionary)
         let cholesterolBodyString = NSAttributedString(string: "\(usdaItem.cholesterol)% \n", attributes: style1AttributesDictionary)
-        itemAttributedString.appendAttributedString(cholesterolTitleString)
-        itemAttributedString.appendAttributedString(cholesterolBodyString)
+        itemAttributedString.append(cholesterolTitleString)
+        itemAttributedString.append(cholesterolBodyString)
         
         // Energy
         let energyTitleString = NSAttributedString(string: "Energy ", attributes: styleFirstWordAttributesDictionary)
         let energyBodyString = NSAttributedString(string: "\(usdaItem.energy)% \n", attributes: style2AttributesDictionary)
-        itemAttributedString.appendAttributedString(energyTitleString)
-        itemAttributedString.appendAttributedString(energyBodyString)
+        itemAttributedString.append(energyTitleString)
+        itemAttributedString.append(energyBodyString)
         
         // Fat Total
         let fatTotalTitleString = NSAttributedString(string: "FatTotal ", attributes: styleFirstWordAttributesDictionary)
         let fatTotalBodyString = NSAttributedString(string: "\(usdaItem.fatTotal)% \n", attributes: style1AttributesDictionary)
-        itemAttributedString.appendAttributedString(fatTotalTitleString)
-        itemAttributedString.appendAttributedString(fatTotalBodyString)
+        itemAttributedString.append(fatTotalTitleString)
+        itemAttributedString.append(fatTotalBodyString)
         
         // Protein
         let proteinTitleString = NSAttributedString(string: "Protein ", attributes: styleFirstWordAttributesDictionary)
         let proteinBodyString = NSAttributedString(string: "\(usdaItem.protein)% \n", attributes: style2AttributesDictionary)
-        itemAttributedString.appendAttributedString(proteinTitleString)
-        itemAttributedString.appendAttributedString(proteinBodyString)
+        itemAttributedString.append(proteinTitleString)
+        itemAttributedString.append(proteinBodyString)
         
         // Sugar
         let sugarTitleString = NSAttributedString(string: "Sugar ", attributes: styleFirstWordAttributesDictionary)
         let sugarBodyString = NSAttributedString(string: "\(usdaItem.sugar)% \n", attributes: style1AttributesDictionary)
-        itemAttributedString.appendAttributedString(sugarTitleString)
-        itemAttributedString.appendAttributedString(sugarBodyString)
+        itemAttributedString.append(sugarTitleString)
+        itemAttributedString.append(sugarBodyString)
         
         // Vitamin C
         let vitaminCTitleString = NSAttributedString(string: "Vitamin C ", attributes: styleFirstWordAttributesDictionary)
         let vitaminCBodyString = NSAttributedString(string: "\(usdaItem.vitaminC)% \n", attributes: style2AttributesDictionary)
-        itemAttributedString.appendAttributedString(vitaminCTitleString)
-        itemAttributedString.appendAttributedString(vitaminCBodyString)
+        itemAttributedString.append(vitaminCTitleString)
+        itemAttributedString.append(vitaminCBodyString)
         
         return itemAttributedString
     }
